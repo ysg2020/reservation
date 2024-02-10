@@ -19,6 +19,7 @@ import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
 import ysg.reservation.repository.ReservationRepository;
+import ysg.reservation.type.ReservationCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,9 +69,9 @@ public class ReservationServiceTest {
                 .START_TIME(LocalDateTime.parse("2024-02-07T16:00:00"))
                 .RESER_TIME(LocalDateTime.parse("2024-02-07T16:00:00").plusDays(2))
                 .TABLE_CNT(2)       //2개의 테이블 예약 시도
-                .RESER_STAT("N")
+                .RESER_STAT(ReservationCode.NONE.getStat())
                 .RESER_CHK_TIME(null)
-                .END_YN("N")
+                .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
                 .build();
 
@@ -99,9 +100,9 @@ public class ReservationServiceTest {
                 .START_TIME(LocalDateTime.parse("2024-02-07T15:30:00"))
                 .RESERTIME(LocalDateTime.parse("2024-02-07T15:30:00").plusDays(2))
                 .TABLE_CNT(2)       //2개의 테이블 예약
-                .RESERSTAT("S")
+                .RESERSTAT(ReservationCode.SUCCESS.getStat())
                 .RESER_CHK_TIME(LocalDateTime.now())
-                .END_YN("N")
+                .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
                 .build();
 
@@ -128,9 +129,9 @@ public class ReservationServiceTest {
                 .START_TIME(LocalDateTime.parse("2024-02-07T16:30:00"))
                 .RESERTIME(LocalDateTime.parse("2024-02-07T16:30:00").plusDays(2))
                 .TABLE_CNT(3)       //3개의 테이블 예약
-                .RESERSTAT("S")
+                .RESERSTAT(ReservationCode.SUCCESS.getStat())
                 .RESER_CHK_TIME(LocalDateTime.now())
-                .END_YN("N")
+                .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
                 .build();
         List<ReservationEntity> reserList = new ArrayList<>();
@@ -176,9 +177,9 @@ public class ReservationServiceTest {
                 .START_TIME(LocalDateTime.parse("2024-02-07T23:30:00"))
                 .RESER_TIME(LocalDateTime.parse("2024-02-07T23:30:00").plusDays(2))
                 .TABLE_CNT(3)
-                .RESER_STAT("S")
+                .RESER_STAT(ReservationCode.SUCCESS.getStat())
                 .RESER_CHK_TIME(LocalDateTime.parse("2024-02-07T23:40:00"))
-                .END_YN("N")
+                .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
                 .build();
 
@@ -207,9 +208,9 @@ public class ReservationServiceTest {
                         .START_TIME(LocalDateTime.parse("2024-02-07T23:30:00"))
                         .RESERTIME(LocalDateTime.parse("2024-02-07T23:30:00").plusDays(2))
                         .TABLE_CNT(2)
-                        .RESERSTAT("C") // 도착 실패
+                        .RESERSTAT(ReservationCode.REJECT.getStat()) // 도착 실패
                         .RESER_CHK_TIME(LocalDateTime.parse("2024-02-07T23:40:00"))
-                        .END_YN("F")    // 도착 실패
+                        .END_YN(ReservationCode.FAIL.getStat())    // 도착 실패
                         .END_TIME(null)
                         .build());
 
@@ -221,7 +222,7 @@ public class ReservationServiceTest {
 
         //then
         verify(reservationRepository,times(1)).save(captor.capture());
-        Assertions.assertEquals(captor.getValue().getRESERSTAT(),"C");
+        Assertions.assertEquals(captor.getValue().getRESERSTAT(),"R");
     }
 
 }

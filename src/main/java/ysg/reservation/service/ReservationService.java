@@ -10,10 +10,10 @@ import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
 import ysg.reservation.repository.ReservationRepository;
+import ysg.reservation.type.ReservationCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -71,11 +71,11 @@ public class ReservationService {
         log.info("[ReservationService] arriveChkReservation -> "+reservationDto.toString());
         // 도착확인 10분전에 도착하지 못한 경우
         if(reservationDto.getRESER_TIME().minusMinutes(10).isBefore(LocalDateTime.now())){
-            // 예약상태 : C(Cancel), 도착 여부 : F(Fail) 처리
-            reservationDto.setRESER_STAT("C");
-            reservationDto.setEND_YN("F");
+            // 예약상태 : R(Reject), 도착 여부 : F(Fail) 처리
+            reservationDto.setRESER_STAT(ReservationCode.REJECT.getStat());
+            reservationDto.setEND_YN(ReservationCode.FAIL.getStat());
         }else{
-            reservationDto.setEND_YN("Y");
+            reservationDto.setEND_YN(ReservationCode.YES.getStat());
             reservationDto.setEND_TIME(LocalDateTime.now());
         }
 
@@ -154,7 +154,7 @@ public class ReservationService {
                                 .DES(storeDto.getDES())
                                 .STAR(storeDto.getSTAR())
                                 .TABLE_CNT(storeDto.getTABLE_CNT())
-                                .build(),"S")
+                                .build(),ReservationCode.SUCCESS.getStat())
                 .orElseThrow(()-> new RuntimeException("성공처리된 예약이 없습니다"));
 
         // 위에서 조회한 예약 건수들의 테이블 합

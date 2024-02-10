@@ -10,6 +10,7 @@ import org.springframework.test.annotation.Rollback;
 import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
+import ysg.reservation.type.ReservationCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,9 +51,9 @@ public class ReservationRepositoryTest {
                 .START_TIME(LocalDateTime.now())
                 .RESERTIME(LocalDateTime.now().plusDays(2))
                 .TABLE_CNT(2)
-                .RESERSTAT("N")
+                .RESERSTAT(ReservationCode.NONE.getStat())
                 .RESER_CHK_TIME(null)
-                .END_YN("N")                // 도착유무 수정 (사용자가 결정하는 요소)
+                .END_YN(ReservationCode.NO.getStat())                // 도착유무 수정 (사용자가 결정하는 요소)
                 .END_TIME(null)             // 도착시간 세팅 (사용자가 결정하는 요소)
                 .build();
         //when
@@ -94,9 +95,9 @@ public class ReservationRepositoryTest {
                 .START_TIME(LocalDateTime.parse("2024-02-07T15:30:00"))
                 .RESERTIME(LocalDateTime.parse("2024-02-07T15:30:00").plusDays(2))
                 .TABLE_CNT(2)
-                .RESERSTAT("S")                               // 예약상태 값 수정 (점장이 수정하는 요소)
+                .RESERSTAT(ReservationCode.SUCCESS.getStat())                               // 예약상태 값 수정 (점장이 수정하는 요소)
                 .RESER_CHK_TIME(LocalDateTime.now())           // 예약확인시간 수정 (점장이 수정하는 요소)
-                .END_YN("N")
+                .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
                 .build();
 
