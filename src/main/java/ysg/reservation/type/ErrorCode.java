@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-    NOT_ENOUGH_TABLE("남아있는 테이블이 없습니다.");
+    NOT_ENOUGH_TABLE("남아있는 테이블이 없습니다."),
+    NOT_FOUND_REVIEW("리뷰를 찾을수 없습니다.");
 
     private String description;
 

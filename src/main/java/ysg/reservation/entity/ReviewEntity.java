@@ -3,6 +3,7 @@ package ysg.reservation.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity(name = "review")
 @Getter
@@ -12,12 +13,21 @@ import javax.persistence.*;
 @Builder
 public class ReviewEntity {
     @Id
-    private int R_IDX;      // 리뷰 고유번호
-    private int S_IDX;      // 매장 고유번호
-    private int M_IDX;      // 이용자 고유번호
-    private String TITLE;   // 제목
-    private String CNT;     // 내용
-    private double STAR;    // 별점
+    @Column(name = "R_IDX")
+    private int RIDX;               // 리뷰 고유번호
+
+    @ManyToOne
+    @JoinColumn(name = "S_IDX")
+    private StoreEntity SIDX;       // 매장 고유번호
+
+    @ManyToOne
+    @JoinColumn(name = "M_IDX")
+    private MemberEntity MIDX;      // 사용자 고유번호
+
+    private String TITLE;           // 제목
+    private String CNT;             // 내용
+    private double STAR;            // 별점
+    private LocalDateTime WRITE_DATE;    // 작성일자
 
 
 

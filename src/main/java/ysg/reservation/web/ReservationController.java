@@ -46,12 +46,12 @@ public class ReservationController {
 
     // 특정 사용자의 예약 정보 확인
     @GetMapping("/member")
-    public List<ReservationDto> getStoreInfo(@RequestBody MemberDto memberDto){
+    public List<ReservationDto> getMemberReservation(@RequestBody MemberDto memberDto){
         return reservationService.getMemberReservation(memberDto);
     }
     // 특정 매장의 예약 정보 확인
     @GetMapping("/store")
-    public List<ReservationDto> getAllReservationInfo(@RequestBody StoreDto storeDto){
+    public List<ReservationDto> getStoreReservation(@RequestBody StoreDto storeDto){
         return reservationService.getStoreReservation(storeDto);
     }
 

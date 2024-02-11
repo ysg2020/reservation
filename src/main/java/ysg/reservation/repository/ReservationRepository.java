@@ -22,6 +22,7 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity,I
     //가장 마지막의 예약 고유번호 조회
     Optional<ReservationEntity> findTopByOrderByRIDXDesc();
 
+    //특정 매장의 해당 시간대에 성공처리된 예약 조회
     List<ReservationEntity> findByRESERTIMEBetweenAndSIDXAndRESERSTAT(LocalDateTime start_time
                                                             , LocalDateTime end_time, StoreEntity s_idx, String reser_stat);
 
