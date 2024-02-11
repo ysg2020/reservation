@@ -18,6 +18,7 @@ import ysg.reservation.dto.StoreDto;
 import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
+import ysg.reservation.exception.impl.ReservationException;
 import ysg.reservation.repository.ReservationRepository;
 import ysg.reservation.type.ReservationCode;
 
@@ -140,11 +141,11 @@ public class ReservationServiceTest {
 
         //총 6개의 테이블을 가지고 있는 매장에서 예약하려는 시간대에 5개의 테이블 예약되어있음
         given(reservationRepository.findByRESERTIMEBetweenAndSIDXAndRESERSTAT(any(),any(),any(),any()))
-                .willReturn(Optional.of(reserList));
+                .willReturn(reserList);
         //when
         //then
         //2개의 테이블 예약 시도 >> 실패
-        Assertions.assertThrows(RuntimeException.class,()-> reservationService.validateReservation(reservationDto));
+        Assertions.assertThrows(ReservationException.class,()-> reservationService.validateReservation(reservationDto));
 
     }
 

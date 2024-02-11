@@ -137,32 +137,12 @@ public class ReservationRepositoryTest {
                 .TABLE_CNT(6)
                 .build();
         //when
-        List<ReservationEntity> reservationList = reservationRepository.findBySIDX(storeEntity)
-                .orElseThrow(()-> new RuntimeException("저장되어 있는 예약이 없습니다"));
+        List<ReservationEntity> reservationList = reservationRepository.findBySIDX(storeEntity);
         //then
         Assertions.assertEquals(reservationList.size(),14); //현재 14건 추가해놓음
 
     }
 
-
-
-    @Test
-    @DisplayName("[ReservationRepository] ")
-    void 매장예약시간사이조회() {
-        //given
-        LocalDateTime reser_time = LocalDateTime.parse("2024-02-09T16:00:00");
-        
-        //when
-        LocalDateTime reser_time_minus = reser_time.minusHours(1);
-        LocalDateTime reser_time_plus = reser_time.plusHours(1);
-        List<ReservationEntity> reservationBetween = reservationRepository
-                .findByRESERTIMEBetween(reser_time_minus, reser_time_plus)
-                .orElseThrow(()-> new RuntimeException("해당 기간에 예약이 없습니다."));        
-        //then
-
-    }
-    
-    
     @Test
     void 성공처리된예약건들의테이블수조회() {
         //given
@@ -179,8 +159,7 @@ public class ReservationRepositoryTest {
                         .DES("테스트 매장 설명")
                         .STAR(3.5)
                         .TABLE_CNT(6)
-                        .build(),"S")
-                .orElseThrow(()-> new RuntimeException("성공처리된 예약이 없습니다"));
+                        .build(),"S");
 
         int result = 0;
         //then

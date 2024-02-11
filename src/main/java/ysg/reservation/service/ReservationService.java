@@ -9,7 +9,9 @@ import ysg.reservation.dto.StoreDto;
 import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
+import ysg.reservation.exception.impl.ReservationException;
 import ysg.reservation.repository.ReservationRepository;
+import ysg.reservation.type.ErrorCode;
 import ysg.reservation.type.ReservationCode;
 
 import java.time.LocalDateTime;
@@ -121,9 +123,6 @@ public class ReservationService {
         reservationRepository.deleteById(r_idx);
     }
 
-
-
-
     // 예약 가능 여부 체크
     public void validateReservation(ReservationDto reservationDto) {
         log.info("[ReservationService] validateReservation -> "+reservationDto.toString());
@@ -131,15 +130,6 @@ public class ReservationService {
         LocalDateTime reser_time = reservationDto.getRESER_TIME();
         LocalDateTime reser_time_minus = reser_time.minusHours(1);
         LocalDateTime reser_time_plus = reser_time.plusHours(1);
-
-        // 성공 처리된 테이블 수
-        int succesReserTableCnt = 0;
-
-        // 예약하려는 테이블 수
-        int reservationTableCnt = reservationDto.getTABLE_CNT();
-
-        // 매장이 보유하고 있는 테이블 수
-        int storeTableCnt = reservationDto.getS_IDX().getTABLE_CNT();
 
         // 매장 Dto
         StoreDto storeDto = reservationDto.getS_IDX();
@@ -154,9 +144,20 @@ public class ReservationService {
                                 .DES(storeDto.getDES())
                                 .STAR(storeDto.getSTAR())
                                 .TABLE_CNT(storeDto.getTABLE_CNT())
-                                .build(),ReservationCode.SUCCESS.getStat())
-                .orElseThrow(()-> new RuntimeException("성공처리된 예약이 없습니다"));
+                                .build(),ReservationCode.SUCCESS.getStat());
+        // 성공 처리되어 있는 예약 건수가 없는 경우 (남아 있는 테이블 수를 계산할 필요 없이 예약 가능)
+        if(reservationEntities.isEmpty()){
+            return;
+        }
+        // 매장에 남아 있는 테이블 계산
+        // 성공 처리된 테이블 수
+        int succesReserTableCnt = 0;
 
+        // 예약하려는 테이블 수
+        int reservationTableCnt = reservationDto.getTABLE_CNT();
+
+        // 매장이 보유하고 있는 테이블 수
+        int storeTableCnt = reservationDto.getS_IDX().getTABLE_CNT();
         // 위에서 조회한 예약 건수들의 테이블 합
         for(ReservationEntity reservation : reservationEntities ){
             succesReserTableCnt += reservation.getTABLE_CNT();
@@ -168,12 +169,11 @@ public class ReservationService {
         // 특정 매장의 해당 시간대에 성공 처리되어 있는 예약 건수들의 테이블 합 + 예약하려는 테이블 수 > 매장이 보유하고 있는 테이블 수
         // 예약 불가능
         if(succesReserTableCnt + reservationTableCnt > storeTableCnt){
-            log.info("[ReservationService] 테이블 수가 부족합니다.");
-            throw new RuntimeException("테이블 수가 부족합니다.");
+            log.info("[ReservationService] 남아있는 테이블이 없습니다.");
+            throw new ReservationException(ErrorCode.NOT_ENOUGH_TABLE);
         }
 
     }
-
 
     // 특정 사용자의 예약 정보 확인
     public List<ReservationDto> getMemberReservation(MemberDto memberDto) {
@@ -188,8 +188,7 @@ public class ReservationService {
                 .GENDER(memberDto.getGENDER())
                 .ROLE(memberDto.getROLE())
                 .build();
-        List<ReservationEntity> memberReservationList = reservationRepository.findByMIDX(memberEntity)
-                .orElseThrow(()->new RuntimeException("해당 사용자의 예약 정보가 없습니다"));
+        List<ReservationEntity> memberReservationList = reservationRepository.findByMIDX(memberEntity);
         return memberReservationList.stream()
                 .map(memberReservation -> ReservationDto.fromEntity(memberReservation))
                 .collect(Collectors.toList());
@@ -207,8 +206,7 @@ public class ReservationService {
                 .STAR(storeDto.getSTAR())
                 .TABLE_CNT(storeDto.getTABLE_CNT())
                 .build();
-        List<ReservationEntity> storeReservationList = reservationRepository.findBySIDX(storeEntity)
-                .orElseThrow(()->new RuntimeException("해당 매장의 예약 정보가 없습니다"));
+        List<ReservationEntity> storeReservationList = reservationRepository.findBySIDX(storeEntity);
 
         return storeReservationList.stream()
                 .map(storeReservation -> ReservationDto.fromEntity(storeReservation))
