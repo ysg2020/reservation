@@ -30,6 +30,10 @@
 - 특정 사용자의 리뷰 정보 확인
 - 특정 매장의 리뷰 정보 확인
 
+회원 API (Member API)
+- 회원 등록
+- 회원 수정
+- 회원 삭제
 ---
 
 ### 예약 API (/reservation)
@@ -78,4 +82,13 @@
 - GET /review/store
   - 특정 매장의 리뷰 정보 조회
 
-  
+### 회원 API (/member)
+- POST /member
+  - 회원 등록
+- PUT /member
+  - 회원 수정
+- DELETE /member
+  - 회원 삭제
+
+## ERD 설계
+![ReservationERD](https://github.com/ysg2020/reservation/assets/70841944/46266210-c8b9-4e95-a59c-e928316e708d)
