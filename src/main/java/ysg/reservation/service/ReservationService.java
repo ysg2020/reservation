@@ -71,6 +71,10 @@ public class ReservationService {
     // 이미 성공 처리된 예약 이므로 예약 가능여부 체크 불필요
     public ReservationDto arriveChkReservation(ReservationDto reservationDto) {
         log.info("[ReservationService] arriveChkReservation -> "+reservationDto.toString());
+        // 성공 처리된 예약이어야만 도착 확인 가능
+        if(!reservationDto.getRESER_STAT().equals(ReservationCode.SUCCESS.getStat())){
+            throw new ReservationException(ErrorCode.NOT_SUCCESS_RESERVATION);
+        }
         // 도착확인 10분전에 도착하지 못한 경우
         if(reservationDto.getRESER_TIME().minusMinutes(10).isBefore(LocalDateTime.now())){
             // 예약상태 : R(Reject), 도착 여부 : F(Fail) 처리
