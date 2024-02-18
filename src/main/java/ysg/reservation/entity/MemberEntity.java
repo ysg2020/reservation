@@ -24,5 +24,7 @@ public class MemberEntity {
     private String GENDER;      // 성별
     private String ROLE;        // 역할
 
+    @OneToMany(mappedBy = "MIDX")
+    private List<ReservationEntity> RIDX = new ArrayList<>();   // 양방향 연관 관계 설정
 
 }

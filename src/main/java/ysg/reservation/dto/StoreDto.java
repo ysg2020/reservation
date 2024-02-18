@@ -6,6 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ysg.reservation.entity.StoreEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,13 +23,20 @@ public class StoreDto {
     private double STAR;        // 별점
     private int TABLE_CNT;       // 매장 테이블 수
 
+    private List<ReservationDto> R_IDX = new ArrayList<>(); // 양방향 연관 관계 설정
+
     public static StoreDto fromEntity(StoreEntity storeEntity){
         return StoreDto.builder()
+                .S_IDX(storeEntity.getSIDX())
                 .NAME(storeEntity.getNAME())
                 .LOC(storeEntity.getLOC())
                 .DES(storeEntity.getDES())
                 .STAR(storeEntity.getSTAR())
                 .TABLE_CNT(storeEntity.getTABLE_CNT())
+                .R_IDX(storeEntity.getRIDX()
+                        .stream()
+                        .map(e-> ReservationDto.fromEntity(e))
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

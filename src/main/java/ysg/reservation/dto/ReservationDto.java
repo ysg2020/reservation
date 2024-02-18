@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
-import ysg.reservation.entity.StoreEntity;
 
 import java.time.LocalDateTime;
 
@@ -18,8 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReservationDto {
     private int R_IDX;                  // 예약 고유번호
-    private StoreDto S_IDX;          // 매장 고유번호
-    private MemberDto M_IDX;         // 이용자 고유번호
+    private int S_IDX;                  // 매장 고유번호
+    private int M_IDX;                  // 이용자 고유번호
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime START_TIME;   // 요청시간
@@ -41,8 +38,8 @@ public class ReservationDto {
     public static ReservationDto fromEntity(ReservationEntity reservationEntity){
         return ReservationDto.builder()
                 .R_IDX(reservationEntity.getRIDX())
-                .S_IDX(StoreDto.fromEntity(reservationEntity.getSIDX()))
-                .M_IDX(MemberDto.fromEntity(reservationEntity.getMIDX()))
+                .S_IDX(reservationEntity.getSIDX().getSIDX())
+                .M_IDX(reservationEntity.getMIDX().getMIDX())
                 .START_TIME(reservationEntity.getSTART_TIME())
                 .RESER_TIME(reservationEntity.getRESERTIME())
                 .TABLE_CNT(reservationEntity.getTABLE_CNT())

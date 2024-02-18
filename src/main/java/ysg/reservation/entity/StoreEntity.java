@@ -3,10 +3,12 @@ package ysg.reservation.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "store")
 @Getter
-@ToString
+//@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -20,6 +22,8 @@ public class StoreEntity {
     private double STAR;    // 별점
     private int TABLE_CNT;   // 매장 테이블 수
 
+    @OneToMany(mappedBy = "SIDX")
+    private List<ReservationEntity> RIDX = new ArrayList<>();   // 양방향 연관 관계 설정
 
 
 }

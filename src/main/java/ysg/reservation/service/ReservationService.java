@@ -10,7 +10,9 @@ import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
 import ysg.reservation.exception.impl.ReservationException;
+import ysg.reservation.repository.MemberRepository;
 import ysg.reservation.repository.ReservationRepository;
+import ysg.reservation.repository.StoreRepository;
 import ysg.reservation.type.ErrorCode;
 import ysg.reservation.type.ReservationCode;
 
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class ReservationService {
     
     private final ReservationRepository reservationRepository;
+    private final StoreRepository storeRepository;
+    private final MemberRepository memberRepository;
 
     // 예약 요청
     public ReservationDto addEditReservation(ReservationDto reservationDto) {
@@ -31,29 +35,14 @@ public class ReservationService {
         //예약 가능 여부 체크
         validateReservation(reservationDto);
 
-        StoreDto storeDto = reservationDto.getS_IDX();
-        MemberDto memberDto = reservationDto.getM_IDX();
+        StoreEntity store = storeRepository.getById(reservationDto.getS_IDX());
+        MemberEntity member = memberRepository.getById(reservationDto.getM_IDX());
 
         //Dto 에서 Entity로 변환
         ReservationEntity reservationEntity = ReservationEntity.builder()
                 .RIDX(reservationDto.getR_IDX())
-                .SIDX(StoreEntity.builder()
-                        .SIDX(storeDto.getS_IDX())
-                        .NAME(storeDto.getNAME())
-                        .LOC(storeDto.getLOC())
-                        .DES(storeDto.getDES())
-                        .STAR(storeDto.getSTAR())
-                        .TABLE_CNT(storeDto.getTABLE_CNT())
-                        .build())
-                .MIDX(MemberEntity.builder()
-                        .MIDX(memberDto.getM_IDX())
-                        .USER_ID(memberDto.getUSER_ID())
-                        .USER_PWD(memberDto.getUSER_PWD())
-                        .NAME(memberDto.getNAME())
-                        .PHONE(memberDto.getPHONE())
-                        .GENDER(memberDto.getGENDER())
-                        .ROLE(memberDto.getROLE())
-                        .build())
+                .SIDX(store)
+                .MIDX(member)
                 .START_TIME(reservationDto.getSTART_TIME())
                 .RESERTIME(reservationDto.getRESER_TIME())
                 .TABLE_CNT(reservationDto.getTABLE_CNT())
@@ -85,30 +74,14 @@ public class ReservationService {
             reservationDto.setEND_TIME(LocalDateTime.now());
         }
 
-        // 매장 Dto, 사용자 Dto
-        StoreDto storeDto = reservationDto.getS_IDX();
-        MemberDto memberDto = reservationDto.getM_IDX();
+        StoreEntity store = storeRepository.getById(reservationDto.getS_IDX());
+        MemberEntity member = memberRepository.getById(reservationDto.getM_IDX());
 
         //Dto 에서 Entity로 변환
         ReservationEntity reservationEntity = ReservationEntity.builder()
                 .RIDX(reservationDto.getR_IDX())
-                .SIDX(StoreEntity.builder()
-                        .SIDX(storeDto.getS_IDX())
-                        .NAME(storeDto.getNAME())
-                        .LOC(storeDto.getLOC())
-                        .DES(storeDto.getDES())
-                        .STAR(storeDto.getSTAR())
-                        .TABLE_CNT(storeDto.getTABLE_CNT())
-                        .build())
-                .MIDX(MemberEntity.builder()
-                        .MIDX(memberDto.getM_IDX())
-                        .USER_ID(memberDto.getUSER_ID())
-                        .USER_PWD(memberDto.getUSER_PWD())
-                        .NAME(memberDto.getNAME())
-                        .PHONE(memberDto.getPHONE())
-                        .GENDER(memberDto.getGENDER())
-                        .ROLE(memberDto.getROLE())
-                        .build())
+                .SIDX(store)
+                .MIDX(member)
                 .START_TIME(reservationDto.getSTART_TIME())
                 .RESERTIME(reservationDto.getRESER_TIME())
                 .TABLE_CNT(reservationDto.getTABLE_CNT())
@@ -135,20 +108,12 @@ public class ReservationService {
         LocalDateTime reser_time_minus = reser_time.minusHours(1);
         LocalDateTime reser_time_plus = reser_time.plusHours(1);
 
-        // 매장 Dto
-        StoreDto storeDto = reservationDto.getS_IDX();
+        StoreEntity store = storeRepository.getById(reservationDto.getS_IDX());
 
         // 특정 매장의 해당 시간대(예약하려는시간의 앞뒤로 1시간씩)에 성공 처리되어 있는 예약 건수 조회
         List<ReservationEntity> reservationEntities = reservationRepository
                 .findByRESERTIMEBetweenAndSIDXAndRESERSTAT(reser_time_minus
-                        ,reser_time_plus,StoreEntity.builder()
-                                .SIDX(storeDto.getS_IDX())
-                                .NAME(storeDto.getNAME())
-                                .LOC(storeDto.getLOC())
-                                .DES(storeDto.getDES())
-                                .STAR(storeDto.getSTAR())
-                                .TABLE_CNT(storeDto.getTABLE_CNT())
-                                .build(),ReservationCode.SUCCESS.getStat());
+                        ,reser_time_plus,store,ReservationCode.SUCCESS.getStat());
         // 성공 처리되어 있는 예약 건수가 없는 경우 (남아 있는 테이블 수를 계산할 필요 없이 예약 가능)
         if(reservationEntities.isEmpty()){
             return;
@@ -161,7 +126,7 @@ public class ReservationService {
         int reservationTableCnt = reservationDto.getTABLE_CNT();
 
         // 매장이 보유하고 있는 테이블 수
-        int storeTableCnt = reservationDto.getS_IDX().getTABLE_CNT();
+        int storeTableCnt = store.getTABLE_CNT();
         // 위에서 조회한 예약 건수들의 테이블 합
         for(ReservationEntity reservation : reservationEntities ){
             succesReserTableCnt += reservation.getTABLE_CNT();

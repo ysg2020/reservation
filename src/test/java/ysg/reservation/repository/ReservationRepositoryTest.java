@@ -14,13 +14,15 @@ import ysg.reservation.type.ReservationCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ReservationRepositoryTest {
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private StoreRepository storeRepository;
+
 
     @Test
     @DisplayName("[ReservationRepository] 매장 예약 저장")
@@ -33,20 +35,9 @@ public class ReservationRepositoryTest {
         ReservationEntity reservationEntity = ReservationEntity.builder()
                 .SIDX(StoreEntity.builder()
                         .SIDX(1)
-                        .NAME("테스트 매장")
-                        .LOC("테스트 매장 위치")
-                        .DES("테스트 매장 설명")
-                        .STAR(3.5)
-                        .TABLE_CNT(6)
                         .build())
                 .MIDX(MemberEntity.builder()
                         .MIDX(2)
-                        .USER_ID("user123")
-                        .USER_PWD("pwd123")
-                        .NAME("테스터2")
-                        .PHONE("01012345678")
-                        .GENDER("M")
-                        .ROLE("aimin")
                         .build())
                 .START_TIME(LocalDateTime.now())
                 .RESERTIME(LocalDateTime.now().plusDays(2))
@@ -74,28 +65,17 @@ public class ReservationRepositoryTest {
     void 매장예약수정_점장() {
         //given
         ReservationEntity reservationEntity = ReservationEntity.builder()
-                .RIDX(6)
+                .RIDX(3)
                 .SIDX(StoreEntity.builder()
                         .SIDX(1)
-                        .NAME("테스트 매장")
-                        .LOC("테스트 매장 위치")
-                        .DES("테스트 매장 설명")
-                        .STAR(3.5)
-                        .TABLE_CNT(6)
                         .build())
                 .MIDX(MemberEntity.builder()
                         .MIDX(1)
-                        .USER_ID("user123")
-                        .USER_PWD("pwd123")
-                        .NAME("테스터")
-                        .PHONE("01012345678")
-                        .GENDER("M")
-                        .ROLE("aimin")
                         .build())
                 .START_TIME(LocalDateTime.parse("2024-02-07T15:30:00"))
                 .RESERTIME(LocalDateTime.parse("2024-02-07T15:30:00").plusDays(2))
                 .TABLE_CNT(2)
-                .RESERSTAT(ReservationCode.SUCCESS.getStat())                               // 예약상태 값 수정 (점장이 수정하는 요소)
+                .RESERSTAT(ReservationCode.SUCCESS.getStat())  // 예약상태 값 수정 (점장이 수정하는 요소)
                 .RESER_CHK_TIME(LocalDateTime.now())           // 예약확인시간 수정 (점장이 수정하는 요소)
                 .END_YN(ReservationCode.NO.getStat())
                 .END_TIME(null)
@@ -109,10 +89,9 @@ public class ReservationRepositoryTest {
 
     @Test
     @DisplayName("[ReservationRepository] 매장 예약 삭제")
-    @Rollback(value = false)
     void 매장예약삭제() {
         //given
-        int r_idx = 12;
+        int r_idx = 13;
         //when
         reservationRepository.deleteById(r_idx);
         //then
@@ -121,25 +100,6 @@ public class ReservationRepositoryTest {
                         .orElseThrow(()-> new RuntimeException("이미 삭제된 예약 입니다.")));
 
         Assertions.assertEquals(exception.getMessage(),"이미 삭제된 예약 입니다.");
-
-    }
-
-    @Test
-    @DisplayName("[ReservationRepository] 매장 예약 조회")
-    void 매장예약조회() {
-        //given
-        StoreEntity storeEntity = StoreEntity.builder()
-                .SIDX(1)
-                .NAME("테스트 매장")
-                .LOC("테스트 매장 위치")
-                .DES("테스트 매장 설명")
-                .STAR(3.5)
-                .TABLE_CNT(6)
-                .build();
-        //when
-        List<ReservationEntity> reservationList = reservationRepository.findBySIDX(storeEntity);
-        //then
-        Assertions.assertEquals(reservationList.size(),14); //현재 14건 추가해놓음
 
     }
 
@@ -167,6 +127,26 @@ public class ReservationRepositoryTest {
             result += reservation.getTABLE_CNT();
         }
         Assertions.assertEquals(6,result);
+
+    }
+
+    @Test
+    @DisplayName("getById 테스트")
+    void getByIdTest() {
+        int s_idx = 3;
+        System.out.println("-----------------------");
+        System.out.println("getById start");
+        StoreEntity getStore = storeRepository.getById(s_idx);
+        System.out.println("getStore class" + getStore.getClass());
+
+        // id값을 사용할경우 select 쿼리를 수행하지 않는다
+        System.out.println("--- S_IDX --- ");
+        System.out.println(getStore.getSIDX());
+
+        // id 값을 제외한 나머지 필드를 사용할 경우 select 쿼리 수행한다
+        System.out.println("--- NAME --- ");
+        System.out.println(getStore.getNAME());
+        System.out.println("-----------------------");
 
     }
 

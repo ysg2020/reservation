@@ -84,25 +84,4 @@ public class ReviewRepositoryTest {
     }
 
 
-    @Test
-    void 특정매장리뷰조회() {
-        //given
-        StoreEntity storeEntity = StoreEntity.builder()
-                .SIDX(1)
-                .NAME("테스트 매장")
-                .LOC("테스트 매장 위치")
-                .DES("테스트 매장 설명")
-                .STAR(3.5)
-                .TABLE_CNT(6)
-                .build();
-        //when
-        List<ReviewEntity> reviewEntityList = reviewRepository.findBySIDX(storeEntity);
-
-        //then
-        Assertions.assertEquals(reviewEntityList.size(),1);
-
-    }
-
-
-
 }

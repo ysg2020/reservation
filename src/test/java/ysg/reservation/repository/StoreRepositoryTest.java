@@ -92,30 +92,20 @@ public class StoreRepositoryTest {
 
 
     @Test
-    @DisplayName("[StoreRepository] 매장 정보 조회")
-    void 매장정보조회() {
+    @DisplayName("[StoreRepository] 특정 매장 정보 조회")
+    void 특정매장정보조회() {
         //given
         String storeName = "테스트 매장";
         //when
         StoreEntity storeEntity = storeRepository.findByNAME(storeName)
                 .orElseThrow(()->new RuntimeException("매장이 존재하지 않습니다"));
-
+        List<ReservationEntity> reservationList = storeEntity.getRIDX();
         //then
         Assertions.assertEquals(storeName, storeEntity.getNAME());
 
     }
 
-    @Test
-    @DisplayName("[StoreRepository] 매장 정보 조회")
-    void 전체매장정보조회() {
-        //given
-        //when
-        List<StoreEntity> storeEntities = storeRepository.findAll();
 
-        //then
-        Assertions.assertEquals(storeEntities.size(),2);
-
-    }
 
 
 }

@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.StoreEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,6 +24,8 @@ public class MemberDto {
     private String PHONE;           // 폰번호
     private String GENDER;          // 성별
     private String ROLE;            // 역할
+
+    private List<ReservationDto> R_IDX = new ArrayList<>(); // 양방향 연관 관계 설정
     public static MemberDto fromEntity(MemberEntity memberEntity){
         return MemberDto.builder()
                 .M_IDX(memberEntity.getMIDX())
@@ -29,6 +35,10 @@ public class MemberDto {
                 .PHONE(memberEntity.getPHONE())
                 .GENDER(memberEntity.getGENDER())
                 .ROLE(memberEntity.getROLE())
+                .R_IDX(memberEntity.getRIDX()
+                        .stream()
+                        .map(e-> ReservationDto.fromEntity(e))
+                        .collect(Collectors.toList()))
                 .build();
     }
 
