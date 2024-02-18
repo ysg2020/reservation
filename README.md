@@ -30,15 +30,19 @@
 - 특정 사용자의 리뷰 정보 확인
 - 특정 매장의 리뷰 정보 확인
 
+회원 API (Member API)
+- 회원 등록
+- 회원 수정
+- 회원 삭제
 ---
 
 ### 예약 API (/reservation)
 제약 사항
-1. 예약 가능 여부
+1. 예약 가능 여부  
 예약시 특정 매장의 예약하려는 시간대(예약하려는시간의 앞뒤로 1시간씩)에 예약상태가 성공 처리되어 있는 예약 건수를 조회하여
 남아있는 테이블이 있는지 계산 후 예약 가능 여부를 판단
 
-2. 도착 확인 체크
+2. 도착 확인 체크  
 도착 확인은 예약시간으로부터 10분전까지만 가능하고 이후에 도착시 예약 거절(Reject) 및 도착 여부(Y/N) F 처리하고 성공 처리된 예약이어야만 도착 확인 가능
 
 - POST /reservation/addEdit
@@ -78,4 +82,13 @@
 - GET /review/store
   - 특정 매장의 리뷰 정보 조회
 
-  
+### 회원 API (/member)
+- POST /member
+  - 회원 등록
+- PUT /member
+  - 회원 수정
+- DELETE /member
+  - 회원 삭제
+
+## ERD 설계
+![ReservationERD](https://github.com/ysg2020/reservation/assets/70841944/46266210-c8b9-4e95-a59c-e928316e708d)
