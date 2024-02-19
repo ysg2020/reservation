@@ -1,11 +1,13 @@
 package ysg.reservation.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 import ysg.reservation.entity.MemberEntity;
 import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.StoreEntity;
 
+import javax.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,7 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity,I
     Optional<ReservationEntity> findTopByOrderByRIDXDesc();
 
     //특정 매장의 해당 시간대에 성공처리된 예약 조회
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ReservationEntity> findByRESERTIMEBetweenAndSIDXAndRESERSTAT(LocalDateTime start_time
                                                             , LocalDateTime end_time, StoreEntity s_idx, String reser_stat);
 

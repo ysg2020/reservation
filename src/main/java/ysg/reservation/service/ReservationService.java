@@ -3,6 +3,7 @@ package ysg.reservation.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ysg.reservation.dto.MemberDto;
 import ysg.reservation.dto.ReservationDto;
 import ysg.reservation.dto.StoreDto;
@@ -30,13 +31,14 @@ public class ReservationService {
     private final MemberRepository memberRepository;
 
     // 예약 요청
+    @Transactional
     public ReservationDto addEditReservation(ReservationDto reservationDto) {
         log.info("[ReservationService] addEditReservation -> "+reservationDto.toString());
-        //예약 가능 여부 체크
-        validateReservation(reservationDto);
-
         StoreEntity store = storeRepository.getById(reservationDto.getS_IDX());
         MemberEntity member = memberRepository.getById(reservationDto.getM_IDX());
+
+        //예약 가능 여부 체크
+        validateReservation(reservationDto);
 
         //Dto 에서 Entity로 변환
         ReservationEntity reservationEntity = ReservationEntity.builder()
@@ -110,14 +112,18 @@ public class ReservationService {
 
         StoreEntity store = storeRepository.getById(reservationDto.getS_IDX());
 
+        log.info("findByRESERTIMEBetweenAndSIDXAndRESERSTAT start!!");
         // 특정 매장의 해당 시간대(예약하려는시간의 앞뒤로 1시간씩)에 성공 처리되어 있는 예약 건수 조회
         List<ReservationEntity> reservationEntities = reservationRepository
                 .findByRESERTIMEBetweenAndSIDXAndRESERSTAT(reser_time_minus
                         ,reser_time_plus,store,ReservationCode.SUCCESS.getStat());
+        log.info("findByRESERTIMEBetweenAndSIDXAndRESERSTAT end!!");
         // 성공 처리되어 있는 예약 건수가 없는 경우 (남아 있는 테이블 수를 계산할 필요 없이 예약 가능)
         if(reservationEntities.isEmpty()){
             return;
         }
+
+        log.info("table calculate!!");
         // 매장에 남아 있는 테이블 계산
         // 성공 처리된 테이블 수
         int succesReserTableCnt = 0;
