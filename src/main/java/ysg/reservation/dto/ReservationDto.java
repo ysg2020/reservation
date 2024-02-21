@@ -1,13 +1,19 @@
 package ysg.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import ysg.reservation.entity.ReservationEntity;
 
 import java.time.LocalDateTime;
+
 
 @Data
 @Builder
@@ -16,23 +22,33 @@ import java.time.LocalDateTime;
 public class ReservationDto {
     private int R_IDX;                  // 예약 고유번호
     private int S_IDX;                  // 매장 고유번호
+
+    @Id
     private int M_IDX;                  // 이용자 고유번호
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime START_TIME;   // 요청시간
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime RESER_TIME;   // 예약시간
 
     private int TABLE_CNT;              // 예약할 테이블 수
     private String RESER_STAT;          // 예약상태
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime RESER_CHK_TIME;      // 예약확인시간
 
     private String END_YN;              // 도착여부
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime END_TIME;     // 도착시간
 
     public static ReservationDto fromEntity(ReservationEntity reservationEntity){
