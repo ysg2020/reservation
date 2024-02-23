@@ -1,12 +1,12 @@
-# 매장 예약 서비스 API
+# :convenience_store: 매장 예약 서비스 API
 매장 테이블을 미리 예약 할 수 있는 서비스 API 입니다
 
 
-## 기술 스택
+## :wrench: 기술 스택
 - Spring boot , java
 - Jpa, Redis
 ---
-## 제약 사항
+## :page_facing_up: 제약 사항
 ### 1. 예약 가능 여부  
 예약시 특정 매장의 예약하려는 시간대(예약 하려는 시간의 앞뒤로 1시간씩)에 예약상태가 성공 처리되어 있는 예약 건수를 조회하여
 남아있는 테이블이 있는지 계산 후 예약 가능 여부를 판단
@@ -66,5 +66,5 @@
 - DELETE /member
   - 회원 삭제
 
-## ERD 설계
+## :pencil2: ERD 설계
 ![erd](https://github.com/ysg2020/reservation/assets/70841944/47cd5cd7-0b9a-4aa4-a6bb-b5d59d7860b5)
