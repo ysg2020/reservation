@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import ysg.reservation.entity.ReservationEntity;
 
 import java.time.LocalDateTime;
@@ -22,8 +21,6 @@ import java.time.LocalDateTime;
 public class ReservationDto {
     private int R_IDX;                  // 예약 고유번호
     private int S_IDX;                  // 매장 고유번호
-
-    @Id
     private int M_IDX;                  // 이용자 고유번호
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

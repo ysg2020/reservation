@@ -7,11 +7,20 @@ import ysg.reservation.dto.MemberDto;
 import ysg.reservation.dto.ReviewDto;
 import ysg.reservation.dto.StoreDto;
 import ysg.reservation.entity.MemberEntity;
+import ysg.reservation.entity.ReservationEntity;
 import ysg.reservation.entity.ReviewEntity;
 import ysg.reservation.entity.StoreEntity;
+import ysg.reservation.exception.impl.ReservationException;
+import ysg.reservation.repository.MemberRepository;
+import ysg.reservation.repository.ReservationRepository;
 import ysg.reservation.repository.ReviewRepository;
+import ysg.reservation.repository.StoreRepository;
+import ysg.reservation.type.ErrorCode;
+import ysg.reservation.type.ReservationCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -20,41 +29,63 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ReservationRepository reservationRepository;
 
     // 리뷰 등록
     public ReviewDto addEditReview(ReviewDto reviewDto) {
         log.info("[ReviewService] addEditReview -> "+reviewDto.toString());
+        // 파라미터로 받아온 예약 고유번호를 프록시 객체로 반환
+        ReservationEntity reservation = reservationRepository.getById(reviewDto.getR_IDX());
 
-        StoreDto storeDto = reviewDto.getS_IDX();
-        MemberDto memberDto = reviewDto.getM_IDX();
+        // 리뷰 수정이 아닌 등록시에만 리뷰 작성 가능 여부 체크
+        if(reviewDto.getV_IDX() == 0){
+            log.info("addReview");
+            validateReview(reservation);
+        }
 
+        log.info("saveReview");
         //Dto에서 Entity로 변환
-        ReviewEntity reservationEntity = ReviewEntity.builder()
-                .RIDX(reviewDto.getR_IDX())
-                .SIDX(StoreEntity.builder()
-                        .SIDX(storeDto.getS_IDX())
-                        .NAME(storeDto.getNAME())
-                        .LOC(storeDto.getLOC())
-                        .DES(storeDto.getDES())
-                        .STAR(storeDto.getSTAR())
-                        .TABLE_CNT(storeDto.getTABLE_CNT())
-                        .build())
-                .MIDX(MemberEntity.builder()
-                        .MIDX(memberDto.getM_IDX())
-                        .USER_ID(memberDto.getUSER_ID())
-                        .USER_PWD(memberDto.getUSER_PWD())
-                        .NAME(memberDto.getNAME())
-                        .PHONE(memberDto.getPHONE())
-                        .GENDER(memberDto.getGENDER())
-                        .ROLE(memberDto.getROLE())
-                        .build())
+        ReviewEntity reviewEntity = ReviewEntity.builder()
+                .VIDX(reviewDto.getV_IDX())
+                .RIDX(reservation)
+                .SIDX(reviewDto.getS_IDX())
+                .MIDX(reviewDto.getM_IDX())
                 .TITLE(reviewDto.getTITLE())
                 .CNT(reviewDto.getCNT())
                 .STAR(reviewDto.getSTAR())
                 .WRITE_DATE(reviewDto.getWRITE_DATE())
                 .build();
 
-        return ReviewDto.fromEntity(reviewRepository.save(reservationEntity));
+        return ReviewDto.fromEntity(reviewRepository.save(reviewEntity));
+    }
+
+    // 리뷰 작성 가능 여부 체크
+    private void validateReview(ReservationEntity reservation) {
+        // 해당 예약이 성공 처리가 아닌 경우 (리뷰 작성 불가)
+        if(!reservation.getRESERSTAT().equals(ReservationCode.SUCCESS.getStat())){
+            throw new ReservationException(ErrorCode.NOT_SUCCESS_RESERVATION);
+
+        }
+        // 반환 받은 프록시 객체(reservation)의 예약 고유 번호로 리뷰 조회
+        Optional<ReviewEntity> writeReview = reviewRepository.findByRIDX(reservation);
+
+        // 해당 예약 고유번호로 리뷰를 이미 작성한 경우
+        if(!writeReview.isEmpty()){
+            throw new ReservationException(ErrorCode.ALREADY_WRITE_REVIEW);
+
+        }
+
+        // 매장 도착 시간에서 한시간을 더한 시간 = 리뷰 오픈 시간
+        LocalDateTime reviewStartTime = reservation.getEND_TIME().plusHours(1);
+
+        // 리뷰를 작성 할 수 있는 최소 시간에 5일을 더한 시간 = 리뷰 마감 시간
+        LocalDateTime reviewEndTime = reviewStartTime.plusDays(5);
+
+        // 리뷰는 매장 도착 시간에서 한시간이 지나야 작성 가능하고 5일 지난뒤엔 리뷰 작성 불가
+        if(reviewStartTime.isAfter(LocalDateTime.now()) || reviewEndTime.isBefore(LocalDateTime.now())){
+            throw new ReservationException(ErrorCode.NOT_TIME_REVIEW);
+
+        }
     }
 
     // 리뷰 삭제
@@ -66,18 +97,9 @@ public class ReviewService {
     // 특정 사용자의 리뷰 정보 확인
     public List<ReviewDto> getMemberReview(MemberDto memberDto) {
         log.info("[ReviewService] getMemberReview -> "+memberDto);
-        // Dto에서 Entity로 변환
-        MemberEntity memberEntity = MemberEntity.builder()
-                .MIDX(memberDto.getM_IDX())
-                .USER_ID(memberDto.getUSER_ID())
-                .USER_PWD(memberDto.getUSER_PWD())
-                .NAME(memberDto.getNAME())
-                .PHONE(memberDto.getPHONE())
-                .GENDER(memberDto.getGENDER())
-                .ROLE(memberDto.getROLE())
-                .build();
-        List<ReviewEntity> memberReviewList = reviewRepository.findByMIDX(memberEntity);
-        return memberReviewList.stream()
+        List<ReviewEntity> memberReservationList = reviewRepository.findByMIDX(memberDto.getM_IDX());
+
+        return memberReservationList.stream()
                 .map(memberReservation -> ReviewDto.fromEntity(memberReservation))
                 .collect(Collectors.toList());
     }
@@ -86,15 +108,7 @@ public class ReviewService {
     public List<ReviewDto> getStoreReview(StoreDto storeDto) {
         log.info("[ReviewService] getStoreReview -> "+storeDto);
         // Dto에서 Entity로 변환
-        StoreEntity storeEntity = StoreEntity.builder()
-                .SIDX(storeDto.getS_IDX())
-                .NAME(storeDto.getNAME())
-                .LOC(storeDto.getLOC())
-                .DES(storeDto.getDES())
-                .STAR(storeDto.getSTAR())
-                .TABLE_CNT(storeDto.getTABLE_CNT())
-                .build();
-        List<ReviewEntity> storeReview = reviewRepository.findBySIDX(storeEntity);
+        List<ReviewEntity> storeReview = reviewRepository.findBySIDX(storeDto.getS_IDX());
 
         return storeReview.stream()
                 .map(storeReservation -> ReviewDto.fromEntity(storeReservation))

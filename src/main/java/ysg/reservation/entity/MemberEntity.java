@@ -8,7 +8,6 @@ import java.util.List;
 
 @Entity(name = "member")
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

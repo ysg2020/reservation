@@ -8,7 +8,6 @@ import java.util.List;
 
 @Entity(name = "store")
 @Getter
-//@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

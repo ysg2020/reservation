@@ -30,27 +30,10 @@ public class ReviewRepositoryTest {
     void 매장리뷰저장() {
         //given
         //저장하기 전의 예약 고유번호 가져오기
-        ReviewEntity review = reviewRepository.findTopByOrderByRIDXDesc()
+        ReviewEntity review = reviewRepository.findTopByOrderByVIDXDesc()
                 .orElse(new ReviewEntity());
 
         ReviewEntity reviewEntity = ReviewEntity.builder()
-                .SIDX(StoreEntity.builder()
-                        .SIDX(1)
-                        .NAME("테스트 매장")
-                        .LOC("테스트 매장 위치")
-                        .DES("테스트 매장 설명")
-                        .STAR(3.5)
-                        .TABLE_CNT(6)
-                        .build())
-                .MIDX(MemberEntity.builder()
-                        .MIDX(2)
-                        .USER_ID("user123")
-                        .USER_PWD("pwd123")
-                        .NAME("테스터2")
-                        .PHONE("01012345678")
-                        .GENDER("M")
-                        .ROLE("aimin")
-                        .build())
                 .TITLE("테스트 리뷰 제목")
                 .CNT("테스트 리뷰 내용")
                 .STAR(3)
@@ -59,12 +42,12 @@ public class ReviewRepositoryTest {
         //when
         reviewRepository.save(reviewEntity);
         //저장후의 예약 고유번호 가져오기
-        ReviewEntity savedReview = reviewRepository.findTopByOrderByRIDXDesc()
+        ReviewEntity savedReview = reviewRepository.findTopByOrderByVIDXDesc()
                 .orElseThrow(()->new RuntimeException("저장되어 있는 리뷰가 없습니다"));
 
         //then
         //저장하기 전의 예약 고유번호에 1을 더한값과 저장후의 예약 고유번호가 같아야 한다
-        Assertions.assertEquals(review.getRIDX() + 1,savedReview.getRIDX());
+        Assertions.assertEquals(review.getVIDX() + 1,savedReview.getVIDX());
 
     }
 
