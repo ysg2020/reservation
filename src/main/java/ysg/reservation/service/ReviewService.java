@@ -35,18 +35,42 @@ public class ReviewService {
     private final MemberRepository memberRepository;
 
     // 리뷰 등록
-    public ReviewDto addEditReview(ReviewDto reviewDto) {
-        log.info("[ReviewService] addEditReview -> "+reviewDto.toString());
+    public ReviewDto addReview(ReviewDto reviewDto) {
+        log.info("[ReviewService] addReview -> "+reviewDto.toString());
         // 파라미터로 받아온 예약 고유번호를 프록시 객체로 반환
         ReservationEntity reservation = reservationRepository.getById(reviewDto.getR_IDX());
 
-        // 리뷰 수정이 아닌 등록시에만 리뷰 작성 가능 여부 체크
-        if(reviewDto.getV_IDX() == 0){
-            log.info("addReview");
-            validateReview(reservation);
-        }
+        //리뷰 작성 가능 여부 체크
+        validateReview(reservation);
 
-        log.info("saveReview");
+        //Dto에서 Entity로 변환
+        ReviewEntity reviewEntity = ReviewEntity.builder()
+                .VIDX(reviewDto.getV_IDX())
+                .RIDX(reservation)
+                .SIDX(reviewDto.getS_IDX())
+                .MIDX(reviewDto.getM_IDX())
+                .TITLE(reviewDto.getTITLE())
+                .CNT(reviewDto.getCNT())
+                .STAR(reviewDto.getSTAR())
+                .WRITE_DATE(reviewDto.getWRITE_DATE())
+                .build();
+
+        return ReviewDto.fromEntity(reviewRepository.save(reviewEntity));
+    }
+
+    // 리뷰 수정
+    public ReviewDto editReview(ReviewDto reviewDto) {
+        log.info("[ReviewService] editReview -> "+reviewDto.toString());
+        // 파라미터로 받아온 예약 고유번호를 프록시 객체로 반환
+        ReservationEntity reservation = reservationRepository.getById(reviewDto.getR_IDX());
+
+        // 리뷰 작성자 조회
+        MemberEntity member = memberRepository.findById(reviewDto.getM_IDX())
+                .orElseThrow(()-> new ReservationException(ErrorCode.NOT_FOUND_USERID));
+
+        // 로그인한 사용자 체크
+        MemberAuthUtil.loginUserCheck(member.getUSERID());
+
         //Dto에서 Entity로 변환
         ReviewEntity reviewEntity = ReviewEntity.builder()
                 .VIDX(reviewDto.getV_IDX())

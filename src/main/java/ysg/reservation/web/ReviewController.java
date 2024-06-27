@@ -22,14 +22,14 @@ public class ReviewController {
     @PostMapping("/addEdit")
     public ReviewDto addReview(@RequestBody ReviewDto reviewDto){
         log.info("[ReviewController] addReservation -> "+reviewDto.toString());
-        return reviewService.addEditReview(reviewDto);
+        return reviewService.addReview(reviewDto);
     }
 
     // 리뷰 수정
     @PutMapping("/addEdit")
     public ReviewDto editReview(@RequestBody ReviewDto reviewDto){
         log.info("[ReviewController] editReservation -> "+reviewDto.toString());
-        return reviewService.addEditReview(reviewDto);
+        return reviewService.editReview(reviewDto);
     }
 
     // 리뷰 삭제
