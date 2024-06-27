@@ -38,9 +38,9 @@
 - DELETE /reservation
   - 예약 삭제
 - GET /reservation/member
-  - 특정 사용자의 예약 정보 확인
+  - 특정 사용자의 예약 내역 조회
 - GET /reservation/store
-  - 특정 매장의 예약 정보 확인
+  - 특정 매장의 예약 내역 조회
 
 ### 매장 API (/store)
 - POST /store
@@ -59,12 +59,7 @@
   - 리뷰 등록
 - PUT /review/addEdit
   - 리뷰 수정
-- DELETE /review
-  - 리뷰 삭제
-- GET /review/member
-  - 특정 사용자의 리뷰 정보 조회
-- GET /review/store
-  - 특정 매장의 리뷰 정보 조회
+- DELETE /review역 조회
 
 ### 회원 API (/member)
 - POST /member
