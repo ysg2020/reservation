@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ysg.reservation.auth.MemberAuthUtil;
 import ysg.reservation.dto.MemberDto;
 import ysg.reservation.dto.ReservationDto;
 import ysg.reservation.dto.StoreDto;
@@ -65,6 +67,7 @@ public class ReservationService {
 
     // 매장 도착 확인 체크
     // 이미 성공 처리된 예약 이므로 예약 가능여부 체크 불필요
+    @PreAuthorize("hasRole('OWNER')")
     public ReservationDto arriveChkReservation(ReservationDto reservationDto) {
         log.info("[ReservationService] arriveChkReservation -> " + reservationDto.toString());
         // 성공 처리된 예약이어야만 도착 확인 가능
@@ -159,11 +162,13 @@ public class ReservationService {
     // 특정 사용자의 예약 정보 확인
     public List<ReservationDto> getMemberReservation(MemberDto memberDto) {
         log.info("[ReservationService] getMemberReservation -> " + memberDto);
+        // 로그인한 사용자의 예약 정보만 확인 가능
+        MemberAuthUtil.loginUserCheck(memberDto.getUSER_ID());
         // Dto에서 Entity로 변환
         MemberEntity memberEntity = MemberEntity.builder()
                 .MIDX(memberDto.getM_IDX())
-                .USER_ID(memberDto.getUSER_ID())
-                .USER_PWD(memberDto.getUSER_PWD())
+                .USERID(memberDto.getUSER_ID())
+                .USERPWD(memberDto.getUSER_PWD())
                 .NAME(memberDto.getNAME())
                 .PHONE(memberDto.getPHONE())
                 .GENDER(memberDto.getGENDER())

@@ -34,9 +34,9 @@ public class ReviewController {
 
     // 리뷰 삭제
     @DeleteMapping
-    public void removeReview(@RequestParam int r_idx){
-        log.info("[ReviewController] removeReservation -> "+r_idx);
-        reviewService.removeReview(r_idx);
+    public void removeReview(@RequestBody ReviewDto reviewDto){
+        log.info("[ReviewController] removeReservation -> "+reviewDto.getV_IDX());
+        reviewService.removeReview(reviewDto);
     }
 
     // 특정 사용자의 리뷰 정보 확인

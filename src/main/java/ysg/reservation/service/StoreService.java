@@ -2,6 +2,7 @@ package ysg.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ysg.reservation.dto.StoreDto;
 import ysg.reservation.entity.StoreEntity;
@@ -17,6 +18,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
 
     // 매장 등록 및 수정
+    @PreAuthorize("hasRole('OWNER')")
     public StoreDto createAlterStore(StoreDto storeDto) {
         log.info("[StoreService] createAlterStore -> "+storeDto.toString());
         StoreEntity storeEntity = StoreEntity.builder()
@@ -31,6 +33,7 @@ public class StoreService {
     }
 
     // 매장 삭제
+    @PreAuthorize("hasRole('OWNER')")
     public void dropStore(int s_idx) {
         log.info("[StoreService] dropStore -> "+s_idx);
         storeRepository.deleteById(s_idx);

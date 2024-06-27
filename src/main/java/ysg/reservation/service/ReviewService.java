@@ -2,7 +2,9 @@ package ysg.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import ysg.reservation.auth.MemberAuthUtil;
 import ysg.reservation.dto.MemberDto;
 import ysg.reservation.dto.ReviewDto;
 import ysg.reservation.dto.StoreDto;
@@ -30,6 +32,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
 
     // 리뷰 등록
     public ReviewDto addEditReview(ReviewDto reviewDto) {
@@ -89,9 +92,15 @@ public class ReviewService {
     }
 
     // 리뷰 삭제
-    public void removeReview(int r_idx) {
-        log.info("[ReviewService] removeReview -> "+r_idx);
-        reviewRepository.deleteById(r_idx);
+    public void removeReview(ReviewDto reviewDto) {
+        log.info("[ReviewService] removeReview -> "+reviewDto.getV_IDX());
+        // 리뷰 작성자 조회
+        MemberEntity member = memberRepository.findById(reviewDto.getM_IDX())
+                .orElseThrow(()-> new ReservationException(ErrorCode.NOT_FOUND_USERID));
+        // 로그인한 사용자 확인
+        MemberAuthUtil.loginUserCheck(member.getUSERID());
+
+        reviewRepository.deleteById(reviewDto.getV_IDX());
     }
 
     // 특정 사용자의 리뷰 정보 확인

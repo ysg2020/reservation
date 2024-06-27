@@ -24,6 +24,13 @@ spring:
     host: localhost
     port: 6379
 
+  jwt:
+    header: Authorization
+    prefix: Bearer
+    secret: cGxheWdyb3VuZC1zcHJpbmctYm9vdC10ZWFtcHJvamVjdC1sb2dpbi1qd3Qtc2VjcmV0LWtleQo=
+    accessToken-valid-time: 1800000 # 30min
+    refreshToken-valid-time: 7200000 # 2hour
+
 logging:
   level:
     root: INFO

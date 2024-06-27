@@ -25,20 +25,16 @@ public class MemberDto {
     private String GENDER;          // 성별
     private String ROLE;            // 역할
 
-    private List<ReservationDto> R_IDX = new ArrayList<>(); // 양방향 연관 관계 설정
+
     public static MemberDto fromEntity(MemberEntity memberEntity){
         return MemberDto.builder()
                 .M_IDX(memberEntity.getMIDX())
-                .USER_ID(memberEntity.getUSER_ID())
-                .USER_PWD(memberEntity.getUSER_PWD())
+                .USER_ID(memberEntity.getUSERID())
+                .USER_PWD(memberEntity.getUSERPWD())
                 .NAME(memberEntity.getNAME())
                 .PHONE(memberEntity.getPHONE())
                 .GENDER(memberEntity.getGENDER())
                 .ROLE(memberEntity.getROLE())
-                .R_IDX(memberEntity.getRIDX()
-                        .stream()
-                        .map(e-> ReservationDto.fromEntity(e))
-                        .collect(Collectors.toList()))
                 .build();
     }
 
